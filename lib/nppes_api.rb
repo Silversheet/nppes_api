@@ -19,10 +19,13 @@ module NPPESApi
     MAILING = 'MAILING'.freeze
   ].freeze
 
+  NPPES_BASE_URL = "https://npiregistry.cms.hhs.gov/api".freeze
+
   # This is the main entry point for searches. Provide params as described below to parameterize the search. Search results can consist
   # of at most 1200 results, and each search can return at most 200 of them. Use the limit and skip parameters as described below to
   # perform pagination of the data.
   # {https://npiregistry.cms.hhs.gov/registry/help-api}
+  # @param base_url [String] API base URL, defaults to NPPES_BASE_URL
   # @param number [Integer] An NPI number to search with. Must be exactly 10 characters
   # @param enumeration_type [String] One of the ENUMERATION_TYPES from above. NPI_1 is an individual search, and NPI_2 is organizations.
   #        Will search across both types if unspecified.
@@ -40,6 +43,7 @@ module NPPESApi
   # @param version [Float] Identifies the version of the API to use (e.g., 2.0, 2.1).
   def self.search(options = {})
     options.merge!({address_purpose:"", version: 2.1})
-    SearchResults.new(RestClient.get('https://npiregistry.cms.hhs.gov/api', params: options).body)
+    base_url = options.delete(:base_url) || NPPES_BASE_URL
+    SearchResults.new(RestClient.get(base_url, params: options).body)
   end
 end
